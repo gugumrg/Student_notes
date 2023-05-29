@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             MenuCard(
-              icon: Icons.note,
+              icon: Icons.edit_note,
               title: 'Catatan',
               onTap: () {
                 Navigator.push(
