@@ -9,17 +9,17 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Menghilangkan tulisan "debug"
-      title: 'Home',
+      title: 'Student Notes',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Home'),
+          title: const Text('Student Notes'),
         ),
         body: GridView.count(
           crossAxisCount: 2,
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           children: [
             MenuCard(
               icon: Icons.schedule,
@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TugasPages()),
+                  MaterialPageRoute(builder: (context) => const TugasPages()),
                 );
               },
             ),
@@ -93,10 +93,10 @@ class MenuCard extends StatelessWidget {
               size: 48.0,
               color: Colors.blue,
             ),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
               ),

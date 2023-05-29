@@ -5,16 +5,16 @@ class JadwalPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Jadwal'),
+          title: const Text('Jadwal'),
         ),
-        body: Center(
+        body: const Center(
           child: Text('Halaman Jadwal'),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Aksi ketika tombol "add" ditekan
           },
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
         ));
   }
 }

@@ -5,9 +5,9 @@ class ChecklistPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checklist'),
+        title: const Text('Checklist'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Halaman Checklist'),
       ),
     );

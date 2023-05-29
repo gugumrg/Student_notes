@@ -5,16 +5,16 @@ class CatatanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Catatan'),
+          title: const Text('Catatan'),
         ),
-        body: Center(
+        body: const Center(
           child: Text('Halaman Catatan'),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Aksi ketika tombol "add" ditekan
           },
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
         ));
   }
 }
