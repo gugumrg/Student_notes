@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChecklistPage extends StatefulWidget {
+  const ChecklistPage({super.key});
+
   @override
   _ChecklistPageState createState() => _ChecklistPageState();
 }
@@ -64,80 +66,86 @@ class _ChecklistPageState extends State<ChecklistPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checklist'),
+        title: const Text('Checklist'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: textEditingController,
-                    decoration: InputDecoration(
-                      labelText: 'Tambah Checklist',
-                      border: OutlineInputBorder(),
-                    ),
+      body: ListView.builder(
+        itemCount: checklistItems.length,
+        itemBuilder: (context, index) {
+          final item = checklistItems[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                _toggleChecklistItem(index);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: item.checked ? Colors.grey[400] : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(
+                    color: Colors.grey[400]!,
+                    width: 2.0,
                   ),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: checklistItems.length,
-              itemBuilder: (context, index) {
-                final item = checklistItems[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      _toggleChecklistItem(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: item.checked
-                            ? Colors.grey[400]
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: Border.all(
-                          color: Colors.grey[400]!,
-                          width: 2.0,
-                        ),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          item.title,
-                          style: TextStyle(
-                            decoration: item.checked
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                          ),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            _removeChecklistItem(index);
-                          },
-                        ),
-                      ),
+                child: ListTile(
+                  title: Text(
+                    item.title,
+                    style: TextStyle(
+                      decoration: item.checked
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
                     ),
                   ),
-                );
-              },
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      _removeChecklistItem(index);
+                    },
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (textEditingController.text.isNotEmpty) {
-            _addChecklistItem(textEditingController.text);
-          }
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Tambah Checklist'),
+                content: TextField(
+                  controller: textEditingController,
+                  decoration: const InputDecoration(
+                    labelText: 'Isi Checklist',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Batal'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (textEditingController.text.isNotEmpty) {
+                        _addChecklistItem(textEditingController.text);
+                      }
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Simpan'),
+                  ),
+                ],
+              );
+            },
+          );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
