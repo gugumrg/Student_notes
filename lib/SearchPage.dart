@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -6,72 +9,206 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  List<String> dataList = [
-    'Data 1',
-    'Data 2',
-    'Data 3',
-    'Data 4',
-    'Data 5',
-    'Data 6',
-    'Data 7',
-  ];
-
-  List<String> searchResults = [];
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, String>> _notes = [];
+  List<ChecklistItem> _checklistItems = [];
+  List<Map<String, String>> _searchResults = [];
 
   @override
   void initState() {
     super.initState();
-    searchResults = dataList; // Menampilkan semua data saat pertama kali dibuka
+    _loadData();
   }
 
-  void _performSearch(String query) {
-    List<String> results = [];
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
-    if (query.isNotEmpty) {
-      for (var item in dataList) {
-        if (item.toLowerCase().contains(query.toLowerCase())) {
-          results.add(item);
+  Future<void> _loadData() async {
+    await _loadNotes();
+    await _loadChecklistItems();
+  }
+
+  Future<void> _loadNotes() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> notesJson = prefs.getStringList('notes') ?? [];
+    List<Map<String, String>> notes = notesJson
+        .map((note) => Map<String, String>.from(jsonDecode(note)))
+        .toList();
+    setState(() {
+      _notes = notes;
+    });
+  }
+
+  Future<void> _loadChecklistItems() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> storedItems = prefs.getStringList('checklistItems') ?? [];
+    setState(() {
+      _checklistItems =
+          storedItems.map((item) => ChecklistItem(item, false)).toList();
+    });
+  }
+
+  void _searchData(String keyword) {
+    setState(() {
+      _searchResults = [];
+
+      // Cari di data catatan
+      for (var note in _notes) {
+        if (note['judul']!.contains(keyword) ||
+            note['deskripsi']!.contains(keyword)) {
+          _searchResults.add(note);
         }
       }
-    } else {
-      results = dataList; // Menampilkan semua data jika query kosong
-    }
 
-    setState(() {
-      searchResults = results;
+      // Cari di data checklist
+      for (var item in _checklistItems) {
+        if (item.title.contains(keyword)) {
+          _searchResults.add({'judul': item.title, 'deskripsi': ''});
+        }
+      }
     });
+  }
+
+  void _navigateToPage(Map<String, String> data) {
+    if (data.containsKey('judul')) {
+      // Data adalah catatan
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CatatanDetailPage(
+            judul: data['judul']!,
+            deskripsi: data['deskripsi']!,
+          ),
+        ),
+      );
+    } else {
+      // Data adalah checklist
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChecklistDetailPage(data['title']!),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search'),
+        title: const Text('Search'),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
-              onChanged: (value) => _performSearch(value),
-              decoration: InputDecoration(
+              controller: _searchController,
+              decoration: const InputDecoration(
                 labelText: 'Cari',
-                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                _searchData(value);
+              },
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: searchResults.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(searchResults[index]),
-                );
-              },
-            ),
+            child: _searchResults.isNotEmpty
+                ? ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      Map<String, String> result = _searchResults[index];
+                      return ListTile(
+                        title: Text(result['judul']!),
+                        subtitle: Text(result['deskripsi']!),
+                        onTap: () {
+                          _navigateToPage(result);
+                        },
+                      );
+                    },
+                  )
+                : const Center(
+                    child: Text('Tidak ada hasil'),
+                  ),
           ),
         ],
       ),
     );
   }
+}
+
+class CatatanDetailPage extends StatelessWidget {
+  final String judul;
+  final String deskripsi;
+
+  const CatatanDetailPage({
+    Key? key,
+    required this.judul,
+    required this.deskripsi,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail Catatan'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Judul: $judul',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text('Deskripsi: $deskripsi'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChecklistDetailPage extends StatelessWidget {
+  final String title;
+
+  const ChecklistDetailPage(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail Checklist'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Title: $title',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChecklistItem {
+  final String title;
+  bool checked;
+
+  ChecklistItem(this.title, this.checked);
 }
