@@ -1,9 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class Task {
+  final String title;
+  final String content;
+  final DateTime scheduledDateTime;
+
+  Task({
+    required this.title,
+    required this.content,
+    required this.scheduledDateTime,
+  });
+}
 
 class TugasPages extends StatefulWidget {
   const TugasPages({Key? key}) : super(key: key);
@@ -14,10 +27,7 @@ class TugasPages extends StatefulWidget {
 
 class _TugasPagesState extends State<TugasPages> {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  TextEditingController titleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
+  List<Task> tasks = [];
   late SharedPreferences preferences;
 
   @override
@@ -61,158 +71,214 @@ class _TugasPagesState extends State<TugasPages> {
     );
   }
 
+  Future<void> initializeSharedPreferences() async {
+    preferences = await SharedPreferences.getInstance();
+    List<String>? savedTasks = preferences.getStringList('tasks');
+    if (savedTasks != null) {
+      setState(() {
+        tasks = savedTasks.map((taskString) {
+          Map<String, dynamic> taskJson =
+              TaskExtension.fromJsonString(taskString);
+          return Task(
+            title: taskJson['title'],
+            content: taskJson['content'],
+            scheduledDateTime: DateTime.parse(taskJson['scheduledDateTime']),
+          );
+        }).toList();
+      });
+    }
+  }
+
+  Future<void> saveTasksToSharedPreferences() async {
+    List<String> taskStrings =
+        tasks.map((task) => task.toJsonString()).toList();
+    await preferences.setStringList('tasks', taskStrings);
+  }
+
   void showSnackbar(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> initializeSharedPreferences() async {
-    preferences = await SharedPreferences.getInstance();
-    String? savedTitle = preferences.getString('title');
-    String? savedContent = preferences.getString('content');
-    if (savedTitle != null) {
-      titleController.text = savedTitle;
-    }
-    if (savedContent != null) {
-      contentController.text = savedContent;
-    }
-  }
+  void showAddTaskDialog() {
+    TextEditingController titleController = TextEditingController();
+    TextEditingController contentController = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay.now();
 
-  Future<void> saveToSharedPreferences() async {
-    await preferences.setString('title', titleController.text);
-    await preferences.setString('content', contentController.text);
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
+    showDialog(
       context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Tambah Tugas'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: titleController,
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  hintText: 'Judul',
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: contentController,
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  hintText: 'Konten',
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () async {
+                  DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      selectedDate = picked;
+                    });
+                  }
+                },
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today),
+                    const SizedBox(width: 8),
+                    Text(
+                      DateFormat('EEE, dd MMM yyyy').format(selectedDate),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () async {
+                  TimeOfDay? picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      selectedTime = picked;
+                    });
+                  }
+                },
+                child: Row(
+                  children: [
+                    const Icon(Icons.access_time),
+                    const SizedBox(width: 8),
+                    Text(selectedTime.format(context)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () {
+                String title = titleController.text;
+                String content = contentController.text;
+                DateTime scheduledDateTime = DateTime(
+                  selectedDate.year,
+                  selectedDate.month,
+                  selectedDate.day,
+                  selectedTime.hour,
+                  selectedTime.minute,
+                );
+                Task newTask = Task(
+                  title: title,
+                  content: content,
+                  scheduledDateTime: scheduledDateTime,
+                );
+
+                setState(() {
+                  tasks.add(newTask);
+                });
+
+                saveTasksToSharedPreferences();
+                scheduleNotification(
+                  title,
+                  content,
+                  TZDateTime.from(
+                      scheduledDateTime, getLocation('Asia/Jakarta')),
+                );
+
+                showSnackbar('Tugas berhasil ditambahkan');
+                Navigator.of(context).pop();
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
     );
-    if (pickedDate != null && pickedDate != selectedDate) {
-      setState(() {
-        selectedDate = pickedDate;
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-    );
-    if (pickedTime != null && pickedTime != selectedTime) {
-      setState(() {
-        selectedTime = pickedTime;
-      });
-    }
-  }
-
-  TZDateTime _getZonedScheduledDateTime() {
-    final scheduledDateTime = TZDateTime(
-      getLocation('Asia/Jakarta'), // Ganti dengan zona waktu yang sesuai
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      selectedTime.hour,
-      selectedTime.minute,
-    );
-    return scheduledDateTime;
-  }
-
-  void createNotification() {
-    if (selectedTime == null) {
-      showSnackbar('Pilih Tanggal');
-      return;
-    }
-
-    if (titleController.text.isEmpty || contentController.text.isEmpty) {
-      showSnackbar('Judul dan Deskripsi harus diisi');
-      return;
-    }
-
-    TZDateTime scheduledDateTime = _getZonedScheduledDateTime();
-
-    if (scheduledDateTime.isBefore(DateTime.now())) {
-      showSnackbar('Pilih tanggal');
-      return;
-    }
-
-    String formattedDateTime =
-        DateFormat('dd-MM-yyyy – HH:mm').format(scheduledDateTime);
-    scheduleNotification(
-        titleController.text, contentController.text, scheduledDateTime);
-    showSnackbar('Notification set for $formattedDateTime');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tugas'),
+        title: const Text('Daftar Tugas'),
       ),
-      body: Container(
-        color: const Color.fromARGB(255, 172, 89, 59),
-        padding: MediaQuery.of(context).padding,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextField(
-                  controller: titleController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: 'Judul',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextField(
-                  controller: contentController,
-                  style: const TextStyle(color: Colors.white),
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(
-                    hintText: 'Deskripsi',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ElevatedButton(
-                  onPressed: () => _selectDate(context),
-                  child: Text(selectedDate != null
-                      ? 'Pilih tanggal: \n ${DateFormat('dd-MM-yyyy').format(selectedDate)}'
-                      : 'Pilih tanggal'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ElevatedButton(
-                  onPressed: () => _selectTime(context),
-                  child: Text(selectedTime != null
-                      ? 'Pilih Jam: \n ${selectedTime.format(context)}'
-                      : 'Pilih Jam'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    createNotification();
-                    saveToSharedPreferences();
-                  },
-                  child: const Text('Atur Notifikasi'),
-                ),
-              ),
-            ],
-          ),
-        ),
+      body: ListView.builder(
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          Task task = tasks[index];
+          return ListTile(
+            title: Text(task.title),
+            subtitle: Text(task.content),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                setState(() {
+                  tasks.removeAt(index);
+                });
+                saveTasksToSharedPreferences();
+                showSnackbar('Tugas berhasil dihapus');
+              },
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: showAddTaskDialog,
+        child: const Icon(Icons.add),
       ),
     );
   }
+}
+
+extension TaskExtension on Task {
+  String toJsonString() {
+    Map<String, dynamic> taskJson = {
+      'title': title,
+      'content': content,
+      'scheduledDateTime': scheduledDateTime.toIso8601String(),
+    };
+    return taskJson.toString();
+  }
+
+  static Map<String, dynamic> fromJsonString(String jsonString) {
+    Map<String, dynamic> taskJson = Map<String, dynamic>.from(
+      jsonDecode(jsonString),
+    );
+    return taskJson;
+  }
+}
+
+void main() {
+  runApp(const MaterialApp(
+    home: TugasPages(),
+  ));
 }

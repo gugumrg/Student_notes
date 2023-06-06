@@ -5,6 +5,8 @@ import 'ChecklistPage.dart';
 import 'CatatanPage.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,7 +49,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CatatanPage()),
+                  MaterialPageRoute(builder: (context) => const CatatanPage()),
                 );
               },
             ),
@@ -57,7 +59,8 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChecklistPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const ChecklistPage()),
                 );
               },
             ),
@@ -74,6 +77,7 @@ class MenuCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const MenuCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.onTap,
