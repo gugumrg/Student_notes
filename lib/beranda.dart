@@ -91,10 +91,10 @@ class MenuCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10.0),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
               blurRadius: 4.0,
             ),
           ],
