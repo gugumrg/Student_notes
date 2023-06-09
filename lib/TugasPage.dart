@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
@@ -211,7 +210,9 @@ class _TugasPagesState extends State<TugasPages> {
                   title,
                   content,
                   TZDateTime.from(
-                      scheduledDateTime, getLocation('Asia/Jakarta')),
+                    scheduledDateTime,
+                    getLocation('Asia/Jakarta'),
+                  ),
                 );
 
                 showSnackbar('Tugas berhasil ditambahkan');
@@ -237,7 +238,18 @@ class _TugasPagesState extends State<TugasPages> {
           Task task = tasks[index];
           return ListTile(
             title: Text(task.title),
-            subtitle: Text(task.content),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(task.content),
+                const SizedBox(height: 4),
+                Text(
+                  DateFormat('EEE, dd MMM yyyy HH:mm')
+                      .format(task.scheduledDateTime),
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {

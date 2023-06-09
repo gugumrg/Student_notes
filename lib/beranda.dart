@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Student Notes'),
+          title: const Text('Learn Student'),
         ),
         body: GridView.count(
           crossAxisCount: 2,
