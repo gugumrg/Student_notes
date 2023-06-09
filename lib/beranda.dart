@@ -11,7 +11,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Menghilangkan tulisan "debug"
-      title: 'Student Notes',
+      title: 'Learn Student',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

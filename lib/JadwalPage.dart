@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'Jadwalpage/jadwal_senin.dart';
 import 'Jadwalpage/jadwal_selasa.dart';
 import 'Jadwalpage/jadwal_rabu.dart';
@@ -103,7 +104,33 @@ class DayCard extends StatelessWidget {
   }
 }
 
-class AddJadwalDialog extends StatelessWidget {
+class AddJadwalDialog extends StatefulWidget {
+  @override
+  _AddJadwalDialogState createState() => _AddJadwalDialogState();
+}
+
+class _AddJadwalDialogState extends State<AddJadwalDialog> {
+  late String selectedTime;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTime = '';
+  }
+
+  Future<void> showTimePickerDialog() async {
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        selectedTime = pickedTime.format(context);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -140,13 +167,14 @@ class AddJadwalDialog extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   decoration: const InputDecoration(labelText: 'Jam'),
+                  readOnly: true,
+                  controller: TextEditingController(text: selectedTime),
+                  onTap: showTimePickerDialog,
                 ),
               ),
               const SizedBox(width: 8.0),
               IconButton(
-                onPressed: () {
-                  // Kode untuk memilih jam
-                },
+                onPressed: showTimePickerDialog,
                 icon: const Icon(Icons.access_time),
               ),
             ],
