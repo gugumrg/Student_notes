@@ -5,7 +5,7 @@ import 'ChecklistPage.dart';
 import 'CatatanPage.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -77,18 +77,28 @@ class MenuCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const MenuCard({
-    super.key,
+    Key? key,
     required this.icon,
     required this.title,
     required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: 2.0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: const Offset(0, 2),
+              blurRadius: 4.0,
+            ),
+          ],
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
