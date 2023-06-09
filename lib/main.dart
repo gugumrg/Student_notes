@@ -31,7 +31,16 @@ class _HomeAppState extends State<HomeApp> {
       ),
       home: Scaffold(
         appBar: null, // Menghilangkan AppBar
-        body: _screens[_currentIndex],
+        body: AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
+          child: _screens[_currentIndex],
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) {
@@ -53,6 +62,11 @@ class _HomeAppState extends State<HomeApp> {
               label: 'Search',
             ),
           ],
+          selectedItemColor: Colors.blue, // Warna item yang dipilih
+          unselectedItemColor: Colors.grey, // Warna item yang tidak dipilih
+          backgroundColor:
+              Colors.white, // Warna latar belakang BottomNavigationBar
+          elevation: 3.0, // Elevation (shadow) BottomNavigationBar
         ),
       ),
     );
