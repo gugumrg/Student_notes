@@ -25,7 +25,7 @@ class _HomeAppState extends State<HomeApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Menghilangkan tulisan "debug"
-      title: 'Student Notes',
+      title: 'Learn Student',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
