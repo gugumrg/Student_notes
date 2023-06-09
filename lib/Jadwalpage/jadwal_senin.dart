@@ -5,9 +5,9 @@ class SeninPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Senin'),
+        title: const Text('Senin'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Halaman Senin'),
       ),
     );

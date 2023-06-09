@@ -5,9 +5,9 @@ class JumatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Jumat'),
+        title: const Text('Jumat'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Halaman Jumat'),
       ),
     );

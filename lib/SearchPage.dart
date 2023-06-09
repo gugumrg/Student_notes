@@ -155,7 +155,7 @@ class CatatanDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detail Catatan'),
+        title: const Text('Detail Catatan'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -186,7 +186,7 @@ class ChecklistDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detail Checklist'),
+        title: const Text('Detail Checklist'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -16,7 +16,7 @@ class _HomeAppState extends State<HomeApp> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),
+    const HomeScreen(),
     KalenderPage(),
     SearchPage(),
   ];

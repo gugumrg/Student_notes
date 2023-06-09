@@ -5,9 +5,9 @@ class SelasaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selasa'),
+        title: const Text('Selasa'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Halaman Selasa'),
       ),
     );
