@@ -32,7 +32,7 @@ class _HomeAppState extends State<HomeApp> {
       home: Scaffold(
         appBar: null, // Menghilangkan AppBar
         body: AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           child: _screens[_currentIndex],
           transitionBuilder: (Widget child, Animation<double> animation) {
             return FadeTransition(

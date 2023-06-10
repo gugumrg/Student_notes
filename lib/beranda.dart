@@ -22,6 +22,8 @@ class HomeScreen extends StatelessWidget {
         body: GridView.count(
           crossAxisCount: 2,
           padding: const EdgeInsets.all(20.0),
+          mainAxisSpacing: 20.0, // Jarak vertikal antara kotak menu
+          crossAxisSpacing: 20.0, // Jarak horizontal antara kotak menu
           children: [
             MenuCard(
               icon: Icons.schedule,
@@ -88,6 +90,7 @@ class MenuCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.all(16.0), // Jarak dalam kotak menu
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10.0),
