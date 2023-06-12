@@ -111,6 +111,8 @@ class AddJadwalDialog extends StatefulWidget {
 
 class _AddJadwalDialogState extends State<AddJadwalDialog> {
   late String selectedTime;
+  String? selectedDay;
+  String? namaJadwal;
 
   @override
   void initState() {
@@ -131,6 +133,33 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
     }
   }
 
+  void addJadwalToDay() {
+    if (namaJadwal != null && selectedDay != null) {
+      switch (selectedDay) {
+        case 'Senin':
+          SeninPage.addJadwal(namaJadwal!);
+          break;
+        case 'Selasa':
+          SelasaPage.addJadwal(namaJadwal!);
+          break;
+        case 'Rabu':
+          RabuPage.addJadwal(namaJadwal!);
+          break;
+        case 'Kamis':
+          KamisPage.addJadwal(namaJadwal!);
+          break;
+        case 'Jumat':
+          JumatPage.addJadwal(namaJadwal!);
+          break;
+        case 'Sabtu':
+          SabtuPage.addJadwal(namaJadwal!);
+          break;
+      }
+
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -140,10 +169,16 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
         children: [
           TextFormField(
             decoration: const InputDecoration(labelText: 'Nama Jadwal'),
+            onChanged: (value) {
+              setState(() {
+                namaJadwal = value;
+              });
+            },
           ),
           const SizedBox(height: 16.0),
           DropdownButtonFormField<String>(
             decoration: const InputDecoration(labelText: 'Hari'),
+            value: selectedDay,
             items: <String>[
               'Senin',
               'Selasa',
@@ -158,7 +193,9 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
               );
             }).toList(),
             onChanged: (String? newValue) {
-              // Kode untuk memilih hari
+              setState(() {
+                selectedDay = newValue;
+              });
             },
           ),
           const SizedBox(height: 16.0),
@@ -183,10 +220,7 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            // Kode untuk menyimpan jadwal baru
-            Navigator.pop(context);
-          },
+          onPressed: addJadwalToDay,
           child: const Text('Simpan'),
         ),
         TextButton(
