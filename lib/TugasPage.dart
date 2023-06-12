@@ -264,178 +264,196 @@ class _TugasPageState extends State<TugasPage> {
         itemCount: tasks.length,
         itemBuilder: (context, index) {
           Task task = tasks[index];
-          return ListTile(
-            title: Text(task.title),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(task.content),
-                const SizedBox(height: 4),
-                Text(
-                  DateFormat('EEE, dd MMM yyyy HH:mm')
-                      .format(task.scheduledDateTime),
-                  style: const TextStyle(fontSize: 12),
+          return Card(
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: ListTile(
+              title: Text(
+                task.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  TextEditingController titleController =
-                      TextEditingController(text: task.title);
-                  TextEditingController contentController =
-                      TextEditingController(text: task.content);
-                  DateTime selectedDate = task.scheduledDateTime;
-                  TimeOfDay selectedTime =
-                      TimeOfDay.fromDateTime(task.scheduledDateTime);
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.content,
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('EEE, dd MMM yyyy HH:mm')
+                        .format(task.scheduledDateTime),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    TextEditingController titleController =
+                        TextEditingController(text: task.title);
+                    TextEditingController contentController =
+                        TextEditingController(text: task.content);
+                    DateTime selectedDate = task.scheduledDateTime;
+                    TimeOfDay selectedTime =
+                        TimeOfDay.fromDateTime(task.scheduledDateTime);
 
-                  return AlertDialog(
-                    title: const Text('Edit Tugas'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: titleController,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            hintText: 'Judul',
+                    return AlertDialog(
+                      title: const Text('Edit Tugas'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: titleController,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              hintText: 'Judul',
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: contentController,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            hintText: 'Konten',
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: contentController,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              hintText: 'Konten',
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        InkWell(
-                          onTap: () async {
-                            DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: selectedDate,
-                              firstDate: DateTime.now(),
-                              lastDate:
-                                  DateTime.now().add(const Duration(days: 365)),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                selectedDate = picked;
-                              });
-                            }
+                          const SizedBox(height: 8),
+                          InkWell(
+                            onTap: () async {
+                              DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now()
+                                    .add(const Duration(days: 365)),
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  selectedDate = picked;
+                                });
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.calendar_today),
+                                const SizedBox(width: 8),
+                                Text(
+                                  DateFormat('EEE, dd MMM yyyy')
+                                      .format(selectedDate),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          InkWell(
+                            onTap: () async {
+                              TimeOfDay? picked = await showTimePicker(
+                                context: context,
+                                initialTime:
+                                    TimeOfDay.fromDateTime(selectedDate),
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  selectedTime = picked;
+                                });
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.access_time),
+                                const SizedBox(width: 8),
+                                Text(selectedTime.format(context)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
                           },
-                          child: Row(
-                            children: [
-                              const Icon(Icons.calendar_today),
-                              const SizedBox(width: 8),
-                              Text(
-                                DateFormat('EEE, dd MMM yyyy')
-                                    .format(selectedDate),
-                              ),
-                            ],
-                          ),
+                          child: const Text('Batal'),
                         ),
-                        const SizedBox(height: 8),
-                        InkWell(
-                          onTap: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.fromDateTime(selectedDate),
+                        TextButton(
+                          onPressed: () {
+                            String title = titleController.text;
+                            String content = contentController.text;
+                            DateTime scheduledDateTime = DateTime(
+                              selectedDate.year,
+                              selectedDate.month,
+                              selectedDate.day,
+                              selectedTime.hour,
+                              selectedTime.minute,
                             );
-                            if (picked != null) {
-                              setState(() {
-                                selectedTime = picked;
-                              });
-                            }
+
+                            setState(() {
+                              task.title = title;
+                              task.content = content;
+                              task.scheduledDateTime = scheduledDateTime;
+                            });
+
+                            saveTasksToSharedPreferences();
+
+                            showSnackbar('Tugas berhasil diperbarui');
+                            Navigator.of(context).pop();
+
+                            cancelNotification(task);
+                            scheduleNotification(task);
                           },
-                          child: Row(
-                            children: [
-                              const Icon(Icons.access_time),
-                              const SizedBox(width: 8),
-                              Text(selectedTime.format(context)),
-                            ],
-                          ),
+                          child: const Text('Simpan'),
                         ),
                       ],
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          String title = titleController.text;
-                          String content = contentController.text;
-                          DateTime scheduledDateTime = DateTime(
-                            selectedDate.year,
-                            selectedDate.month,
-                            selectedDate.day,
-                            selectedTime.hour,
-                            selectedTime.minute,
-                          );
+                    );
+                  },
+                );
+              },
+              onLongPress: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Hapus Tugas'),
+                      content:
+                          const Text('Anda yakin ingin menghapus tugas ini?'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Batal'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              tasks.remove(task);
+                            });
 
-                          setState(() {
-                            task.title = title;
-                            task.content = content;
-                            task.scheduledDateTime = scheduledDateTime;
-                          });
+                            saveTasksToSharedPreferences();
 
-                          saveTasksToSharedPreferences();
+                            showSnackbar('Tugas berhasil dihapus');
+                            Navigator.of(context).pop();
 
-                          showSnackbar('Tugas berhasil diperbarui');
-                          Navigator.of(context).pop();
-
-                          cancelNotification(task);
-                          scheduleNotification(task);
-                        },
-                        child: const Text('Simpan'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            onLongPress: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Hapus Tugas'),
-                    content:
-                        const Text('Anda yakin ingin menghapus tugas ini?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            tasks.removeAt(index);
-                          });
-
-                          saveTasksToSharedPreferences();
-
-                          showSnackbar('Tugas berhasil dihapus');
-                          Navigator.of(context).pop();
-
-                          cancelNotification(task);
-                        },
-                        child: const Text('Hapus'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
+                            cancelNotification(task);
+                          },
+                          child: const Text('Hapus'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
           );
         },
       ),
@@ -448,7 +466,21 @@ class _TugasPageState extends State<TugasPage> {
 }
 
 void main() {
-  runApp(const MaterialApp(
-    home: TugasPage(),
-  ));
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tugas App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: const TugasPage(),
+    );
+  }
 }

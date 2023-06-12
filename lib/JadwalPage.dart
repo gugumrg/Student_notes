@@ -137,22 +137,22 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
     if (namaJadwal != null && selectedDay != null) {
       switch (selectedDay) {
         case 'Senin':
-          SeninPage.addJadwal(namaJadwal!);
+          SeninPage.addJadwal(namaJadwal!, selectedTime);
           break;
         case 'Selasa':
-          SelasaPage.addJadwal(namaJadwal!);
+          SelasaPage.addJadwal(namaJadwal!, selectedTime);
           break;
         case 'Rabu':
-          RabuPage.addJadwal(namaJadwal!);
+          RabuPage.addJadwal(namaJadwal!, selectedTime);
           break;
         case 'Kamis':
-          KamisPage.addJadwal(namaJadwal!);
+          KamisPage.addJadwal(namaJadwal!, selectedTime);
           break;
         case 'Jumat':
-          JumatPage.addJadwal(namaJadwal!);
+          JumatPage.addJadwal(namaJadwal!, selectedTime);
           break;
         case 'Sabtu':
-          SabtuPage.addJadwal(namaJadwal!);
+          SabtuPage.addJadwal(namaJadwal!, selectedTime);
           break;
       }
 

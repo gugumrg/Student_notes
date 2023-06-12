@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 class RabuPage extends StatefulWidget {
   static List<Map<String, String>> jadwalRabu = [];
 
-  static void addJadwal(String namaJadwal) {
+  static void addJadwal(String namaJadwal, String jamJadwal) {
     jadwalRabu.add({
       'nama': namaJadwal,
+      'jam': jamJadwal,
     });
   }
 
@@ -15,6 +16,7 @@ class RabuPage extends StatefulWidget {
 
 class _RabuPageState extends State<RabuPage> {
   TextEditingController _textEditingController = TextEditingController();
+  TextEditingController _jamEditingController = TextEditingController();
   int _selectedIndex = -1;
 
   @override
@@ -28,23 +30,48 @@ class _RabuPageState extends State<RabuPage> {
         itemBuilder: (context, index) {
           final jadwal = RabuPage.jadwalRabu[index];
           final namaJadwal = jadwal['nama'];
+          final jamJadwal = jadwal['jam'];
 
           return ListTile(
-            title: Text(namaJadwal!),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(namaJadwal!),
+                Text(
+                  'Jam: $jamJadwal',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
             onTap: () {
               setState(() {
-                _textEditingController.text = namaJadwal!;
+                _textEditingController.text = namaJadwal;
+                _jamEditingController.text = jamJadwal!;
                 _selectedIndex = index;
               });
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Edit Jadwal'),
-                  content: TextFormField(
-                    controller: _textEditingController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nama Jadwal',
-                    ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: _textEditingController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nama Jadwal',
+                        ),
+                      ),
+                      TextFormField(
+                        controller: _jamEditingController,
+                        decoration: const InputDecoration(
+                          labelText: 'Jam Jadwal',
+                        ),
+                      ),
+                    ],
                   ),
                   actions: [
                     TextButton(
@@ -52,6 +79,8 @@ class _RabuPageState extends State<RabuPage> {
                         setState(() {
                           RabuPage.jadwalRabu[_selectedIndex]['nama'] =
                               _textEditingController.text;
+                          RabuPage.jadwalRabu[_selectedIndex]['jam'] =
+                              _jamEditingController.text;
                         });
                         Navigator.pop(context);
                       },
