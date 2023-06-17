@@ -12,6 +12,8 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, String>> _notes = [];
   List<ChecklistItem> _checklistItems = [];
+  List<String> _tasks = [];
+  List<String> _schedules = [];
   List<Map<String, String>> _searchResults = [];
 
   @override
@@ -29,6 +31,8 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _loadData() async {
     await _loadNotes();
     await _loadChecklistItems();
+    await _loadTasks();
+    await _loadSchedules();
   }
 
   Future<void> _loadNotes() async {
@@ -51,6 +55,22 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  Future<void> _loadTasks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> storedTasks = prefs.getStringList('tasks') ?? [];
+    setState(() {
+      _tasks = storedTasks;
+    });
+  }
+
+  Future<void> _loadSchedules() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> storedSchedules = prefs.getStringList('schedules') ?? [];
+    setState(() {
+      _schedules = storedSchedules;
+    });
+  }
+
   void _searchData(String keyword) {
     setState(() {
       _searchResults = [];
@@ -69,6 +89,20 @@ class _SearchPageState extends State<SearchPage> {
           _searchResults.add({'judul': item.title, 'deskripsi': ''});
         }
       }
+
+      // Cari di data tasks
+      for (var task in _tasks) {
+        if (task.contains(keyword)) {
+          _searchResults.add({'judul': task, 'deskripsi': ''});
+        }
+      }
+
+      // Cari di data schedules
+      for (var schedule in _schedules) {
+        if (schedule.contains(keyword)) {
+          _searchResults.add({'judul': schedule, 'deskripsi': ''});
+        }
+      }
     });
   }
 
@@ -85,13 +119,33 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
     } else {
-      // Data adalah checklist
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChecklistDetailPage(data['title']!),
-        ),
-      );
+      // Data adalah checklist, tugas, atau jadwal
+      String title = data['title']!;
+      if (_checklistItems.any((item) => item.title == title)) {
+        // Data adalah checklist
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChecklistDetailPage(title),
+          ),
+        );
+      } else if (_tasks.contains(title)) {
+        // Data adalah tugas
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TaskDetailPage(title),
+          ),
+        );
+      } else if (_schedules.contains(title)) {
+        // Data adalah jadwal
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ScheduleDetailPage(title),
+          ),
+        );
+      }
     }
   }
 
@@ -110,6 +164,7 @@ class _SearchPageState extends State<SearchPage> {
               decoration: const InputDecoration(
                 labelText: 'Cari',
                 border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
               ),
               onChanged: (value) {
                 _searchData(value);
@@ -122,12 +177,36 @@ class _SearchPageState extends State<SearchPage> {
                     itemCount: _searchResults.length,
                     itemBuilder: (context, index) {
                       Map<String, String> result = _searchResults[index];
-                      return ListTile(
-                        title: Text(result['judul']!),
-                        subtitle: Text(result['deskripsi']!),
-                        onTap: () {
-                          _navigateToPage(result);
-                        },
+                      String category = _notes.contains(result)
+                          ? 'Catatan'
+                          : _checklistItems
+                                  .any((item) => item.title == result['judul'])
+                              ? 'Checklist'
+                              : _tasks.contains(result['judul'])
+                                  ? 'Tugas'
+                                  : 'Jadwal';
+
+                      Color chipColor =
+                          category == 'Tugas' ? Colors.orange : Colors.blue;
+
+                      return Card(
+                        child: ListTile(
+                          title: Text(
+                            result['judul']!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(result['deskripsi']!),
+                          trailing: Chip(
+                            label: Text(
+                              category,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: chipColor,
+                          ),
+                          onTap: () {
+                            _navigateToPage(result);
+                          },
+                        ),
                       );
                     },
                   )
@@ -194,7 +273,65 @@ class ChecklistDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Title: $title',
+              'Judul: $title',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TaskDetailPage extends StatelessWidget {
+  final String title;
+
+  const TaskDetailPage(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Tugas'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Judul: $title',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScheduleDetailPage extends StatelessWidget {
+  final String title;
+
+  const ScheduleDetailPage(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Jadwal'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Judul: $title',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -207,8 +344,8 @@ class ChecklistDetailPage extends StatelessWidget {
 }
 
 class ChecklistItem {
-  final String title;
-  bool checked;
+  String title;
+  bool isDone;
 
-  ChecklistItem(this.title, this.checked);
+  ChecklistItem(this.title, this.isDone);
 }

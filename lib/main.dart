@@ -17,7 +17,7 @@ class _HomeAppState extends State<HomeApp> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    KalenderPage(),
+    const KalenderPage(),
     SearchPage(),
   ];
 

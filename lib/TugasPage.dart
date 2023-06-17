@@ -76,7 +76,7 @@ class _TugasPageState extends State<TugasPage> {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
     final InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+        const InitializationSettings(android: initializationSettingsAndroid);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
@@ -270,7 +270,7 @@ class _TugasPageState extends State<TugasPage> {
             child: ListTile(
               title: Text(
                 task.title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
