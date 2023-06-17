@@ -76,6 +76,12 @@ class _SelasaPageState extends State<SelasaPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Batal'),
+                    ),
+                    TextButton(
+                      onPressed: () {
                         setState(() {
                           SelasaPage.jadwalSelasa[_selectedIndex]['nama'] =
                               _textEditingController.text;
@@ -85,12 +91,6 @@ class _SelasaPageState extends State<SelasaPage> {
                         Navigator.pop(context);
                       },
                       child: const Text('Simpan'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Batal'),
                     ),
                   ],
                 ),

@@ -76,6 +76,12 @@ class _KamisPageState extends State<KamisPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Batal'),
+                    ),
+                    TextButton(
+                      onPressed: () {
                         setState(() {
                           KamisPage.jadwalKamis[_selectedIndex]['nama'] =
                               _textEditingController.text;
@@ -85,12 +91,6 @@ class _KamisPageState extends State<KamisPage> {
                         Navigator.pop(context);
                       },
                       child: const Text('Simpan'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Batal'),
                     ),
                   ],
                 ),

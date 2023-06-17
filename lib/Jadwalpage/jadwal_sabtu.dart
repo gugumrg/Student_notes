@@ -76,6 +76,12 @@ class _SabtuPageState extends State<SabtuPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Batal'),
+                    ),
+                    TextButton(
+                      onPressed: () {
                         setState(() {
                           SabtuPage.jadwalSabtu[_selectedIndex]['nama'] =
                               _textEditingController.text;
@@ -85,12 +91,6 @@ class _SabtuPageState extends State<SabtuPage> {
                         Navigator.pop(context);
                       },
                       child: const Text('Simpan'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Batal'),
                     ),
                   ],
                 ),

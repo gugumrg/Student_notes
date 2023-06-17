@@ -74,6 +74,9 @@ class DayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -168,7 +171,9 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Nama Jadwal'),
+            decoration: const InputDecoration(
+              labelText: 'Nama Jadwal',
+            ),
             onChanged: (value) {
               setState(() {
                 namaJadwal = value;
@@ -177,7 +182,9 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
           ),
           const SizedBox(height: 16.0),
           DropdownButtonFormField<String>(
-            decoration: const InputDecoration(labelText: 'Hari'),
+            decoration: const InputDecoration(
+              labelText: 'Hari',
+            ),
             value: selectedDay,
             items: <String>[
               'Senin',
@@ -203,7 +210,9 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
             children: [
               Expanded(
                 child: TextFormField(
-                  decoration: const InputDecoration(labelText: 'Jam'),
+                  decoration: const InputDecoration(
+                    labelText: 'Jam',
+                  ),
                   readOnly: true,
                   controller: TextEditingController(text: selectedTime),
                   onTap: showTimePickerDialog,
@@ -220,14 +229,14 @@ class _AddJadwalDialogState extends State<AddJadwalDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: addJadwalToDay,
-          child: const Text('Simpan'),
-        ),
-        TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: const Text('Batal'),
+        ),
+        TextButton(
+          onPressed: addJadwalToDay,
+          child: const Text('Simpan'),
         ),
       ],
     );

@@ -76,6 +76,12 @@ class _RabuPageState extends State<RabuPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Batal'),
+                    ),
+                    TextButton(
+                      onPressed: () {
                         setState(() {
                           RabuPage.jadwalRabu[_selectedIndex]['nama'] =
                               _textEditingController.text;
@@ -85,12 +91,6 @@ class _RabuPageState extends State<RabuPage> {
                         Navigator.pop(context);
                       },
                       child: const Text('Simpan'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Batal'),
                     ),
                   ],
                 ),

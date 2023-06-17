@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChecklistPage extends StatefulWidget {
-  const ChecklistPage({super.key});
+  const ChecklistPage({Key? key});
 
   @override
   _ChecklistPageState createState() => _ChecklistPageState();
@@ -66,29 +66,41 @@ class _ChecklistPageState extends State<ChecklistPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Checklist'),
+        title: const Text('Tasks'),
       ),
       body: ListView.builder(
         itemCount: checklistItems.length,
         itemBuilder: (context, index) {
           final item = checklistItems[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
+          return Dismissible(
+            key: Key(item.title),
+            direction: DismissDirection.horizontal,
+            onDismissed: (direction) {
+              _removeChecklistItem(index);
+            },
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: const Icon(Icons.delete, color: Colors.white),
             ),
-            child: GestureDetector(
-              onTap: () {
-                _toggleChecklistItem(index);
-              },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: item.checked ? Colors.grey[400] : Colors.transparent,
+                  color: item.checked ? Colors.grey[400] : Colors.white,
                   borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(
-                    color: Colors.grey[400]!,
-                    width: 2.0,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: ListTile(
                   title: Text(
@@ -97,13 +109,17 @@ class _ChecklistPageState extends State<ChecklistPage> {
                       decoration: item.checked
                           ? TextDecoration.lineThrough
                           : TextDecoration.none,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: item.checked ? Colors.white : Colors.black,
                     ),
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      _removeChecklistItem(index);
+                  trailing: Checkbox(
+                    value: item.checked,
+                    onChanged: (value) {
+                      _toggleChecklistItem(index);
                     },
+                    activeColor: Colors.blue,
                   ),
                 ),
               ),
@@ -117,11 +133,11 @@ class _ChecklistPageState extends State<ChecklistPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Tambah Checklist'),
+                title: const Text('Tambah Task'),
                 content: TextField(
                   controller: textEditingController,
                   decoration: const InputDecoration(
-                    labelText: 'Isi Checklist',
+                    labelText: 'Isi Task',
                   ),
                 ),
                 actions: [

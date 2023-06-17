@@ -76,6 +76,12 @@ class _JumatPageState extends State<JumatPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Batal'),
+                    ),
+                    TextButton(
+                      onPressed: () {
                         setState(() {
                           JumatPage.jadwalJumat[_selectedIndex]['nama'] =
                               _textEditingController.text;
@@ -85,12 +91,6 @@ class _JumatPageState extends State<JumatPage> {
                         Navigator.pop(context);
                       },
                       child: const Text('Simpan'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Batal'),
                     ),
                   ],
                 ),

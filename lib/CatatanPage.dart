@@ -103,6 +103,7 @@ class _CatatanPageState extends State<CatatanPage> {
             children: [
               TextField(
                 controller: _judulController,
+                maxLines: 1,
                 decoration: const InputDecoration(
                   labelText: 'Judul',
                   border: OutlineInputBorder(),
@@ -111,6 +112,7 @@ class _CatatanPageState extends State<CatatanPage> {
               const SizedBox(height: 16.0),
               TextField(
                 controller: _deskripsiController,
+                maxLines: 5,
                 decoration: const InputDecoration(
                   labelText: 'Deskripsi',
                   border: OutlineInputBorder(),
@@ -144,6 +146,7 @@ class _CatatanPageState extends State<CatatanPage> {
             children: [
               TextField(
                 controller: _judulController,
+                maxLines: 1,
                 decoration: const InputDecoration(
                   labelText: 'Judul',
                   border: OutlineInputBorder(),
@@ -152,6 +155,7 @@ class _CatatanPageState extends State<CatatanPage> {
               const SizedBox(height: 16.0),
               TextField(
                 controller: _deskripsiController,
+                maxLines: 5,
                 decoration: const InputDecoration(
                   labelText: 'Deskripsi',
                   border: OutlineInputBorder(),
@@ -184,38 +188,45 @@ class _CatatanPageState extends State<CatatanPage> {
           ? const Center(
               child: Text('Tidak ada catatan'),
             )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _notes.length,
-                    itemBuilder: (context, index) {
-                      Map<String, String> note = _notes[index];
-                      return ListTile(
-                        title: Text(
-                          note['judul']!,
-                          style: _selectedNoteIndex == index
-                              ? const TextStyle(
-                                  decoration: TextDecoration.lineThrough)
-                              : null,
-                        ),
-                        subtitle: Text(
-                          note['deskripsi']!,
-                          style: _selectedNoteIndex == index
-                              ? const TextStyle(
-                                  decoration: TextDecoration.lineThrough)
-                              : null,
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => _deleteNoteAtIndex(index),
-                        ),
-                        onTap: () => _showNoteDetails(index),
-                      );
-                    },
+          : ListView.builder(
+              itemCount: _notes.length,
+              itemBuilder: (context, index) {
+                Map<String, String> note = _notes[index];
+                return Dismissible(
+                  key: Key(index.toString()),
+                  direction: DismissDirection.horizontal,
+                  onDismissed: (direction) {
+                    _deleteNoteAtIndex(index);
+                  },
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                ),
-              ],
+                  child: ListTile(
+                    title: Text(
+                      note['judul']!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _selectedNoteIndex == index
+                          ? const TextStyle(
+                              decoration: TextDecoration.lineThrough)
+                          : null,
+                    ),
+                    subtitle: Text(
+                      note['deskripsi']!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _selectedNoteIndex == index
+                          ? const TextStyle(
+                              decoration: TextDecoration.lineThrough)
+                          : null,
+                    ),
+                    onTap: () => _showNoteDetails(index),
+                  ),
+                );
+              },
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNoteDialog,
