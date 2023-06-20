@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'TugasPage.dart';
 import 'JadwalPage.dart';
-import 'ChecklistPage.dart';
+import 'TaskPage.dart';
 import 'CatatanPage.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -61,8 +61,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const ChecklistPage()),
+                  MaterialPageRoute(builder: (context) => const TaskPage()),
                 );
               },
             ),

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ChecklistPage extends StatefulWidget {
-  const ChecklistPage({Key? key});
+class TaskPage extends StatefulWidget {
+  const TaskPage({Key? key});
 
   @override
   _ChecklistPageState createState() => _ChecklistPageState();
 }
 
-class _ChecklistPageState extends State<ChecklistPage> {
+class _ChecklistPageState extends State<TaskPage> {
   List<ChecklistItem> checklistItems = [];
   TextEditingController textEditingController = TextEditingController();
 
